@@ -1,9 +1,9 @@
 {% extends "auctions/layout.html" %}
 
-{% block title %}Active Listings - Auctions{% endblock %}
+{% block title %}Active Listings in {{ category.name }} - Auctions{% endblock %}
 
 {% block main %}
-    <h2>Active Listings</h2>
+    <h2>Active Listings in {{ category.name }}</h2>
 
     {% for listing in active_listings %}
         <div class="card mb-3">

@@ -1,0 +1,93 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Listing: {{ listing.title }} - Auctions{% endblock %}
+
+{% block main %}
+    <h2>{{ listing.title }}</h2>
+
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-4">
+                <img src="{{ listing.image_url }}" class="card-img" alt="Listing Image">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ listing.title }}</h5>
+                    <p class="card-text">{{ listing.description }}</p>
+                    <p class="card-text">Current Price: ${{ current_bid }}</p>
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'watchlist' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            <input type="hidden" name="action" value="{% if listing in user.user_watchlist.listings.all %}remove_from_watchlist{% else %}add_to_watchlist{% endif %}">
+                            <button type="submit" class="btn btn-primary">
+                            {% if listing in user.user_watchlist.listings.all %}
+                                Remove from Watchlist
+                            {% else %}
+                                Add to Watchlist
+                            {% endif %}
+                            </button>
+                        </form>
+
+                        {% if listing.active %}
+                            <form method="post" action="{% url 'place_bid' listing.id %}">
+                                {% csrf_token %}
+                                <label for="bid_amount">Bid Amount:</label>
+                                <input type="number" name="bid_amount" id="bid_amount" required>
+                                <button type="submit" class="btn btn-primary">Place Bid</button>
+                            </form>
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                    {{ form.bid_amount.errors }}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if user == listing.creator %}
+                            {% if listing.active %}
+                                <form method="post" action="{% url 'close_auction' listing.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Close Auction</button>
+                                </form>
+                            {% endif %}
+
+                        {% endif %}
+
+                        {% if not listing.active %}
+                            {% if user == listing.winner %}
+                                <p>Congratulations! You are the winner of this auction, {{ listing.winner.username }}.</p>
+                            {% else %}
+                                <p>This auction is closed.</p>
+                            {% endif %}
+                        {% endif %}
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Comments</h3>
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'add_comment' listing.id %}">
+            {% csrf_token %}
+            <label for="comment_text">Add a comment:</label>
+            <textarea name="comment_text" id="comment_text" required></textarea>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    {% else %}
+        <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+    {% endif %}
+
+    <ul>
+        {% for comment in listing.comments.all %}
+            <li>
+                {{ comment.text }}
+                <small>by {{ comment.user.username }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
