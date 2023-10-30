@@ -32,7 +32,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             # Accessing user.watchlist will create the Watchlist if it doesn't exist
-            user.watchlist
+            #user.watchlist
 
             return HttpResponseRedirect(reverse("index"))
         else:
