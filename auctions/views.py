@@ -196,11 +196,11 @@ def listing_page(request, listing_id):
         # Check for form submissions (e.g., Watchlist, Bid, Close Auction, Comment)
 
         # Implement Watchlist feature
-        if "add_to_watchlist" in request.POST:
+        if "Add to Watchlist" in request.POST:
             # Add the listing to the user's watchlist
             user.user_watchlist.add(listing)
             #watchlist(request)
-        elif "remove_from_watchlist" in request.POST:
+        elif "Remove from Watchlist" in request.POST:
             # Remove the listing from the user's watchlist
             user.watchlist.remove(listing)
 
