@@ -15,13 +15,14 @@ class Category(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-class Watchlist(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name="user_watchlist")
-    listing = models.ForeignKey('Listing', on_delete=models.CASCADE, null=True)
-    listings = models.ManyToManyField('Listing', related_name="watchlists")
+# class Watchlist(models.Model):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name="user_watchlist")
+#     listing = models.ForeignKey('Listing', on_delete=models.CASCADE, null=True)
+#     # should not be needed:
+#     # listings = models.ManyToManyField('Listing', related_name="watchlists")
 
-    def __str__(self):
-        return f'{self.user} {self.listing}'
+#     def __str__(self):
+#         return f'{self.user} {self.listing}'
 
 class Listing(models.Model):
     title = models.CharField(max_length=255)
@@ -34,7 +35,8 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="won_listings")
-    watchers = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Watchlist', related_name="watchlistings")
+    watchers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="watchlistings")
+    image = models.ImageField(upload_to='images/listings', blank=True)
 
     def __str__(self):
         return f'{self.title} {self.image_url} {self.starting_bid}'
