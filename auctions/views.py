@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidde
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.db.models import Max
-from .models import Listing, Category, Bid, Comment, Watchlist
+from .models import Listing, Category, Bid, Comment
 from .forms import ListingForm, BidForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -76,7 +76,7 @@ def register(request):
 
 def create_listing(request):
     if request.method == "POST":
-        form = ListingForm(request.POST)
+        form = ListingForm(request.POST, request.FILES)
         if form.is_valid():
             listing = form.save(commit=False)
             listing.creator = request.user
@@ -113,17 +113,21 @@ def watchlist(request):
         action = request.POST.get('action')
 
         # Get the user's watchlist
-        watchlist, created = Watchlist.objects.get_or_create(user=user)
+        # watchlist, created = Watchlist.objects.get_or_create(user=user)
 
         listing = Listing.objects.get(pk=listing_id)
 
         if action == "add_to_watchlist":
-            watchlist.listings.add(listing)
+            user.watchlistings.add(listing)
+#            watchlist.listings.add(listing)
         elif action == "remove_from_watchlist":
-            watchlist.listings.remove(listing)
+            user.watchlistings.remove(listing)
+#            watchlist.listings.remove(listing)
 
     # Get the user's updated watchlist
-    watchlist_items = user.user_watchlist.all()
+#    watchlist_items = user.user_watchlist.all()
+    watchlist_items = user.watchlistings.all()
+    
     return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
 
